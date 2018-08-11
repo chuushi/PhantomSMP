@@ -14,3 +14,8 @@ the config file and will appear after first server run with this plugin.
 remove-targeting-rested: true
 
 ```
+
+# External Links
+
+* [Spigot resource link](https://www.spigotmc.org/resources/phantomsmp.59721/)
+* [BukkitDev resource link](https://dev.bukkit.org/projects/phantom-smp)
