@@ -18,4 +18,4 @@ remove-targeting-rested: true
 # External Links
 
 * [Spigot resource link](https://www.spigotmc.org/resources/phantomsmp.59721/)
-* [BukkitDev resource link](https://dev.bukkit.org/projects/phantom-smp)
+* [BukkitDev resource link](https://dev.bukkit.org/projects/phantomsmp)
