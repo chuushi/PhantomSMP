@@ -86,17 +86,6 @@ public class PhantomSMP extends JavaPlugin {
         phantomPlayerMap.put(phantom, p);
     }
 
-    private void removePhantom(Phantom phantom) {
-        Player p = phantomPlayerMap.remove(phantom);
-        if (p == null)
-            return;
-
-        playerPhantomMap.get(p).remove(phantom);
-
-        if (phantom.getCustomName() == null)
-            phantom.remove();
-    }
-
     private void removePlayerPhantom(Player p) {
         Iterator<Phantom> i = playerPhantomMap.get(p).iterator();
         while(i.hasNext()) {
@@ -184,7 +173,13 @@ public class PhantomSMP extends JavaPlugin {
             if (!(e.getEntity() instanceof Phantom))
                 return;
 
-            removePhantom((Phantom) e.getEntity());
+            Phantom phantom = (Phantom) e.getEntity();
+
+            Player p = phantomPlayerMap.remove(phantom);
+            if (p == null)
+                return;
+
+            playerPhantomMap.get(p).remove(phantom);
         }
     }
 }
