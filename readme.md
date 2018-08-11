@@ -1,4 +1,5 @@
-# PhantomSMP
+# ![Logo](https://www.spigotmc.org/data/resource_icons/59/59721.jpg) PhantomSMP
+
 Better Phantom handling for SMP
 
 # Configuration
