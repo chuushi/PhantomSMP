@@ -89,8 +89,6 @@ public class PhantomSMP extends JavaPlugin {
 
         // Player rested before
         if (!phantomSpawnAllowed(p)) {
-            getLogger().info("Removed illegally targeting phantom");
-            Thread.dumpStack();
             if (e != null)
                 e.setCancelled(true);
             // TODO: Quesiton: Also remove the phantom?
@@ -119,7 +117,7 @@ public class PhantomSMP extends JavaPlugin {
             Phantom phantom = i.next();
             if (phantom.getTarget() == p) {
                 phantomPlayerMap.remove(phantom);
-                phantom.remove();
+                phantom.setTarget(null);
             }
             i.remove();
         }
