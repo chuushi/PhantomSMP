@@ -1,0 +1,11 @@
+name: PhantomSMP
+version: @version@
+author: SimonOrJ
+description: Teleport players who left off in the End to the Spawn
+main: com.simonorj.mc.phantomsmp.PhantomSMP
+website: https://arcaneminecraft.com/
+api-version: 1.13
+
+commands:
+  settsr:
+    usage: /settsr <time since reset>
