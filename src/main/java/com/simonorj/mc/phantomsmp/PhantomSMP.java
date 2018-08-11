@@ -5,7 +5,6 @@ import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Mob;
 import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -22,7 +21,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Map;
 
 public class PhantomSMP extends JavaPlugin {
     private Map<Player, LinkedHashSet<Phantom>> playerPhantomMap = null;
@@ -138,12 +140,11 @@ public class PhantomSMP extends JavaPlugin {
         @EventHandler
         public void playerLeave(PlayerQuitEvent e) {
             Player p = e.getPlayer();
-            Iterator<Map.Entry<Phantom, Player>> i = phantomPlayerMap.entrySet().iterator();
-            while (i.hasNext()) {
-                Map.Entry<Phantom, Player> entry = i.next();
-                if (entry.getValue() == p) {
-                    i.remove();
-                    entry.getKey().setTarget(null);
+
+            for (Phantom phantom : playerPhantomMap.get(p)) {
+                if (phantom.getTarget() == p) {
+                    phantom.setTarget(null);
+                    phantomPlayerMap.remove(phantom);
                 }
             }
         }
