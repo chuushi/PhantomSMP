@@ -1,7 +1,7 @@
 name: PhantomSMP
 version: @version@
 author: SimonOrJ
-description: Teleport players who left off in the End to the Spawn
+description: Advanced phantom mechanics especially for SMP servers
 main: com.simonorj.mc.phantomsmp.PhantomSMP
-website: https://arcaneminecraft.com/
+website: https://github.com/SimonOrJ/PhantomSMP
 api-version: 1.13
