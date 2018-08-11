@@ -38,6 +38,10 @@ public class PhantomSMP extends JavaPlugin {
         this.phantomPlayerMap = new HashMap<>();
         this.removeTargetingRested = getConfig().getBoolean("remove-targeting-rested", true);
 
+        for (Player p : getServer().getOnlinePlayers()) {
+            this.playerPhantomMap.put(p, new LinkedHashSet<>());
+        }
+
         // Initiate map
         for (World w : getServer().getWorlds()) {
             if (w.getEnvironment() != World.Environment.NORMAL)
