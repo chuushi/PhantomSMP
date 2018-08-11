@@ -1,0 +1,6 @@
+# PhantomSMP by SimonOrJ
+
+# Remove phantoms that try to target player slept within three (Minecraft) days?
+#   true = remove phantom targeting rested player
+#   false = Keep phantoms (and make phantoms try to target another player)
+remove-targeting-rested: true

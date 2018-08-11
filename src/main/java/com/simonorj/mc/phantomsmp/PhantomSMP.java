@@ -2,8 +2,6 @@ package com.simonorj.mc.phantomsmp;
 
 import org.bukkit.Statistic;
 import org.bukkit.World;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Player;
@@ -29,12 +27,16 @@ import java.util.Map;
 public class PhantomSMP extends JavaPlugin {
     private Map<Player, LinkedHashSet<Phantom>> playerPhantomMap = null;
     private Map<Phantom, Player> phantomPlayerMap = null;
+    private boolean removeTargetingRested = true;
     private static final int TIME_SINCE_REST_PHANTOM_SPAWN = 72000;
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
+
         this.playerPhantomMap = new HashMap<>();
         this.phantomPlayerMap = new HashMap<>();
+        this.removeTargetingRested = getConfig().getBoolean("remove-targeting-rested", true);
 
         // Initiate map
         for (World w : getServer().getWorlds()) {
@@ -47,26 +49,6 @@ public class PhantomSMP extends JavaPlugin {
         }
 
         getServer().getPluginManager().registerEvents(new PhantomListener(), this);
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (args.length != 0 && sender instanceof Player) {
-            int val;
-            try {
-                val = Integer.parseInt(args[0]);
-            } catch (NumberFormatException ignored) {
-                return false;
-            }
-
-            Player p = (Player) sender;
-
-            p.setStatistic(Statistic.TIME_SINCE_REST, val);
-            p.sendMessage("Set TSR to " + val);
-            return true;
-        }
-
-        return false;
     }
 
     public void onDisable() {
@@ -93,9 +75,10 @@ public class PhantomSMP extends JavaPlugin {
         if (!phantomSpawnAllowed(p)) {
             if (e != null)
                 e.setCancelled(true);
-            // TODO: Quesiton: Also remove the phantom?
-            //else
-            phantom.remove();
+
+            if (removeTargetingRested)
+                if (phantom.getCustomName() == null)
+                    phantom.remove();
         }
 
         // Phantom spawn is legal
@@ -110,7 +93,8 @@ public class PhantomSMP extends JavaPlugin {
 
         playerPhantomMap.get(p).remove(phantom);
 
-        phantom.remove();
+        if (phantom.getCustomName() == null)
+            phantom.remove();
     }
 
     private void removePlayerPhantom(Player p) {
