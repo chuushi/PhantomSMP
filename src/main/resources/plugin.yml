@@ -5,3 +5,14 @@ description: Advanced phantom mechanics especially for SMP servers
 main: com.simonorj.mc.phantomsmp.PhantomSMP
 website: https://github.com/SimonOrJ/PhantomSMP
 api-version: 1.13
+
+permissions:
+  phantomsmp.disallowspawn:
+    description: Don't let phantom spawn on the player at all.
+    default: false
+  phantomsmp.ignore:
+    description: >
+      Don't let phantoms target the player or be removed.
+      This will ignore `remove-targeting-rested` configuration option for the
+      player and keep the phantom flying around.
+    default: false

@@ -1,6 +1,16 @@
-# PhantomSMP by SimonOrJ
+# PhantomSMP by Simon Chuu
 
-# Remove phantoms that try to target player slept within three (Minecraft) days?
+# For help, follow the plugin project link below:
+# https://github.com/SimonOrJ/PhantomSMP/
+
+# Remove phantoms that try to target player slept within three (Minecraft)
+# days?
 #   true = remove phantom targeting rested player
 #   false = Keep phantoms (and make phantoms try to target another player)
 remove-targeting-rested: true
+
+# How many ticks since player rested should phantoms ignore the player?
+#   NOTE: Any value under 72000 (3 full Minecraft days) will essentially be
+#   ignored for phantom spawning.  It will only have an effect on already
+#   spawned phantoms only.
+disallow-targeting-for: 72000
