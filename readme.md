@@ -1,6 +1,29 @@
 # ![Logo](https://www.spigotmc.org/data/resource_icons/59/59721.jpg) PhantomSMP
 
-Better Phantom handling for SMP
+*Better Phantom handling for SMP*
+
+This plugin was created to combat phantom issues in the survival Multiplayer
+server environment.
+
+Normally, phantoms spawn above players who had three or more Minecraft days of
+restlessness. After the phantom(s) spawn, when the player uses the bed or is
+killed, phantoms will continue to haunt the same player until they cannot find
+the player!  While they still exist, they will move on to assault any other
+players regardless of if they rested.
+
+In single player, the above will not be any problem since the lone player can
+skip the night and let the sun kill off the phantoms. However, that's not the
+case on multiplayer servers where players have to endure phantom attacks until
+the next sunrise.
+
+This plugin addresses this issue. Features:
+
+* Phantoms will ignore players who used the bed within last three Minecraft
+  days. In addition, this duration is configurable.
+* Phantoms will ignore or despawn on players who uses the bed or is killed.
+  This is configurable as well.
+* Control if the phantoms should despawn when they try to target a rested
+  player using a configuration option.
 
 # Configuration
 
