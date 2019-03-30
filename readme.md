@@ -3,18 +3,35 @@
 Better Phantom handling for SMP
 
 # Configuration
-There is only one option to configure.  The configuration details are inside
-the config file and will appear after first server run with this plugin.
 
-```yml
-# PhantomSMP by SimonOrJ
+There are two configuration options that you can set.
 
-# Remove phantoms that try to target player slept within three (Minecraft) days?
-#   true = remove phantom targeting rested player
-#   false = Keep phantoms (and make phantoms try to target another player)
-remove-targeting-rested: true
+* `remove-targeting-rested`: *Default: true.* Remove phantoms that try to
+  target players who recently rested.
+* `remove-when-sleeping`: *Default: false.* Remove phantoms as soon as player
+  gets in the bed.
+* `disallow-targeting-for`: *Default: 72000.* Ticks since player's last rest
+  before a phantom starts targeting them. 
 
-```
+For additional information, check [`config.yml`](src/main/resources/config.yml).
+
+## Permissions
+
+All permission nodes are not applied by default, even to server operators.
+
+* `phantomsmp.disallowspawn`: If given, phantoms will not spawn on this player.
+* `phantomsmp.ignore`: If given, phantoms will essentially ignore this player.
+
+For additional information, check [`plugin.yml`](src/main/resources/plugin.yml).
+
+# Disallowing Phantom Spawn
+
+The Bukkit API does not allow for directly checking which player caused the
+phantoms to spawn.  Therefore, if `disallow-targeting-for` is greater than
+72000, phantoms will spawn in for a few seconds until they start targeting a
+player.  When the very first target of the phantom is a well-rested player,
+they will despawn immediately.  The same happens when the player is given the
+`phantomsmp.disallowspawn` permission.
 
 # External Links
 

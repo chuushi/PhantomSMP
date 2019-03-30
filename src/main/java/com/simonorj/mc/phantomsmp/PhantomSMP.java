@@ -10,6 +10,7 @@ public class PhantomSMP extends JavaPlugin {
     private static PhantomSMP instance = null;
     private PhantomListener listener = null;
     boolean removeTargetingRested;
+    boolean removeWhenSleeping;
     int disallowSpawningFor;
 
     @Override
@@ -21,6 +22,7 @@ public class PhantomSMP extends JavaPlugin {
             saveConfig();
 
         this.removeTargetingRested = getConfig().getBoolean(ConfigSaver.REMOVE_TARGETING_RESTED_NODE, true);
+        this.removeWhenSleeping = getConfig().getBoolean(ConfigSaver.REMOVE_WHEN_SLEEPING_NODE, false);
         this.disallowSpawningFor= getConfig().getInt(ConfigSaver.DISALLOW_SPAWNING_FOR_NODE, 72000);
 
         this.listener = new PhantomListener();
@@ -29,9 +31,8 @@ public class PhantomSMP extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        PhantomSMP.instance = null;
-        listener.disable();
         listener = null;
+        PhantomSMP.instance = null;
     }
 
     @Override
@@ -51,7 +52,7 @@ public class PhantomSMP extends JavaPlugin {
         }
     }
 
-    public static PhantomSMP getInstance() {
+    static PhantomSMP getInstance() {
         return instance;
     }
 }

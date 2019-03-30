@@ -6,8 +6,13 @@
 # Remove phantoms that try to target player slept within three (Minecraft)
 # days?
 #   true = remove phantom targeting rested player
-#   false = Keep phantoms (and make phantoms try to target another player)
+#   false = Keep phantoms (and make phantoms ignore the player)
 remove-targeting-rested: true
+
+# Remove phantoms right away when the player sleeps in bed?
+#   true = remove phantoms as soon as player sleeps
+#   false = Keep phantoms (and let the above option take care of it)
+remove-when-sleeping: false
 
 # How many ticks since player rested should phantoms ignore the player?
 #   NOTE: Any value under 72000 (3 full Minecraft days) will essentially be

@@ -18,18 +18,16 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.*;
 
 public class PhantomListener implements Listener {
     private static final String DISALLOW_SPAWN_PERM = "phantomsmp.disallowspawn";
     private static final String IGNORE_PERM = "phantomsmp.ignore";
 
-    private Map<Player, LinkedHashSet<Phantom>> playerPhantomMap = new HashMap<>();
-    private Map<Phantom, Player> phantomPlayerMap = new HashMap<>();
-    private PhantomSMP plugin;
+    private final Map<Player, LinkedHashSet<Phantom>> playerPhantomMap = new HashMap<>();
+    private final Map<Phantom, Player> phantomPlayerMap = new HashMap<>();
+    private final Set<Phantom> newPhantom = new LinkedHashSet<>();
+    private final PhantomSMP plugin;
 
     PhantomListener() {
         this.plugin = PhantomSMP.getInstance();
@@ -44,75 +42,88 @@ public class PhantomListener implements Listener {
 
             for (Entity e : w.getLivingEntities())
                 if (e instanceof Phantom)
-                    addPhantom((Phantom) e);
+                    targeting((Phantom) e, null, null);
         }
     }
 
-    void disable() {
-        this.playerPhantomMap = null;
-        this.phantomPlayerMap = null;
-        this.plugin = null;
+    private boolean recentlyRested(Player p) {
+        return p.getStatistic(Statistic.TIME_SINCE_REST) < plugin.disallowSpawningFor;
     }
 
-    private boolean phantomSpawnAllowed(Player p) {
-        return p.getStatistic(Statistic.TIME_SINCE_REST) > plugin.disallowSpawningFor || p.hasPermission(DISALLOW_SPAWN_PERM);
-    }
-
-    private boolean phantomIgnore(Player p) {
-        return plugin.removeTargetingRested || p.hasPermission(IGNORE_PERM);
-    }
-
-    private void addPhantom(Phantom phantom) {
-        addPhantom(phantom, null);
-    }
-
-    private void addPhantom(Phantom phantom, Cancellable e) {
-        addPhantom(phantom, null, e);
-    }
-
-    private void addPhantom(Phantom phantom, Player newTarget, Cancellable e) {
-        if (newTarget == null && !(phantom.getTarget() instanceof Player)) {
+    private void targeting(Phantom phantom, Player newTarget, Cancellable e) {
+        plugin.getLogger().info("Targeting triggered");
+        Player p;
+        if (newTarget != null)
+            p = newTarget;
+        else if (phantom.getTarget() instanceof Player) {
+            p = (Player) phantom.getTarget();
+        } else {
+            plugin.getLogger().info("Target is null");
             return;
         }
 
-        Player p = newTarget != null ? newTarget : (Player) phantom.getTarget();
+        // If newly spawned phantom
+        if (newPhantom.remove(phantom)) {
+            if (p.hasPermission(DISALLOW_SPAWN_PERM) || recentlyRested(p)) {
+                if (e != null)
+                    e.setCancelled(true);
+                phantom.remove();
+                plugin.getLogger().info("Phantom removed");
+                return;
+            }
+        }
 
-        // Player rested before
-        if (!phantomSpawnAllowed(p)) {
+        // If targeting is not allowed
+        boolean ignore = p.hasPermission(IGNORE_PERM);
+        if (ignore || recentlyRested(p)) {
             if (e != null)
                 e.setCancelled(true);
+            else
+                phantom.setTarget(null);
 
-            if (phantomIgnore(p))
-                if (phantom.getCustomName() == null)
-                    phantom.remove();
+            if (!ignore && plugin.removeTargetingRested && phantom.getCustomName() == null)
+                phantom.remove();
+
+            plugin.getLogger().info("Phantom targetting cancelled");
+            return;
         }
 
         // Phantom spawn is legal
         playerPhantomMap.computeIfAbsent(p, k -> new LinkedHashSet<>()).add(phantom);
         phantomPlayerMap.put(phantom, p);
+        plugin.getLogger().info("Phantom is now targetting");
     }
 
-    private void removePlayerPhantom(Player p) {
+    private void spawned(Phantom phantom) {
+        newPhantom.add(phantom);
+        plugin.getLogger().info("New phantom spawned");
+    }
+
+    private void untarget(Player p, boolean sleeping) {
         Iterator<Phantom> i = playerPhantomMap.get(p).iterator();
         while(i.hasNext()) {
             Phantom phantom = i.next();
             if (phantom.getTarget() == p) {
                 phantomPlayerMap.remove(phantom);
                 phantom.setTarget(null);
+                plugin.getLogger().info("Phantom no longer targets");
+            }
+
+            if (sleeping && plugin.removeWhenSleeping) {
+                phantom.remove();
+                plugin.getLogger().info("Phantom removed");
             }
             i.remove();
         }
     }
 
-    // Initiate when player joins
     @EventHandler(priority = EventPriority.MONITOR)
-    public void playerJoin(PlayerJoinEvent e) {
+    public void onPlayerJoin(PlayerJoinEvent e) {
         playerPhantomMap.put(e.getPlayer(), new LinkedHashSet<>());
     }
 
-    // Reset when player leaves
     @EventHandler
-    public void playerLeave(PlayerQuitEvent e) {
+    public void onPlayerLeave(PlayerQuitEvent e) {
         Player p = e.getPlayer();
 
         for (Phantom phantom : playerPhantomMap.get(p)) {
@@ -123,54 +134,51 @@ public class PhantomListener implements Listener {
         }
     }
 
-    // Remove phantoms when player sleeps
     @EventHandler
-    public void playerUseBed(PlayerBedEnterEvent e) {
-        if (e.isCancelled())
-            return;
-
-        removePlayerPhantom(e.getPlayer());
-    }
-
-    @EventHandler
-    public void playerDied(PlayerDeathEvent e) {
-        removePlayerPhantom(e.getEntity());
-    }
-
-    // Check phantom when they spawn wrongly
-    @EventHandler
-    public void phantomSpawn(CreatureSpawnEvent e) {
+    public void onPhantomSpawn(CreatureSpawnEvent e) {
         if (e.isCancelled() || !(e.getEntity() instanceof Phantom)) {
             return;
         }
 
-        addPhantom((Phantom) e.getEntity(), e);
+        spawned((Phantom) e.getEntity());
+    }
+
+    @EventHandler
+    public void onPlayerSleeping(PlayerBedEnterEvent e) {
+        if (e.isCancelled())
+            return;
+
+        untarget(e.getPlayer(), true);
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent e) {
+        untarget(e.getEntity(), false);
     }
 
     // Remove phantom that targets player who slept
     @EventHandler
-    public void phantomTarget(EntityTargetLivingEntityEvent e) {
+    public void onPhantomTargeting(EntityTargetLivingEntityEvent e) {
         if (e.isCancelled() || !(e.getEntity() instanceof Phantom && e.getTarget() instanceof Player)) {
             return;
         }
 
-        addPhantom((Phantom) e.getEntity(), (Player) e.getTarget(), e);
+        targeting((Phantom) e.getEntity(), (Player) e.getTarget(), e);
     }
 
     // Check phantom in loaded chunks
     @EventHandler
-    public void phantomInLoadedChunk(ChunkLoadEvent e) {
+    public void onPhantomInLoadedChunk(ChunkLoadEvent e) {
         if (e.getWorld().getEnvironment() != World.Environment.NORMAL)
             return;
 
         for (Entity ent : e.getChunk().getEntities())
             if (ent instanceof Phantom)
-                addPhantom((Phantom) ent);
+                targeting((Phantom) ent, null, null);
     }
 
-    // Check phantom on death
     @EventHandler
-    public void phantomDied(EntityDeathEvent e) {
+    public void onPhantomDeath(EntityDeathEvent e) {
         if (!(e.getEntity() instanceof Phantom))
             return;
 
