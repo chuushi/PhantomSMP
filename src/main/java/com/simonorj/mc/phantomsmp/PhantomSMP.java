@@ -1,6 +1,7 @@
 package com.simonorj.mc.phantomsmp;
 
 import com.google.common.base.Charsets;
+import com.simonorj.mc.phantomsmp.shadow.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
@@ -27,6 +28,15 @@ public class PhantomSMP extends JavaPlugin {
 
         this.listener = new PhantomListener();
         getServer().getPluginManager().registerEvents(listener, this);
+
+        if (getConfig().getBoolean(ConfigTool.ENABLE_METRICS_NODE, true))
+            setupMetrics();
+    }
+
+    private void setupMetrics() {
+        Metrics metrics = new Metrics(this);
+        metrics.addCustomChart(new Metrics.SimplePie("remove-targeting-rested", () -> String.valueOf(removeTargetingRested)));
+        metrics.addCustomChart(new Metrics.SimplePie("remove-targeting-rested", () -> String.valueOf(removeWhenSleeping)));
     }
 
     @Override

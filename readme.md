@@ -4,7 +4,7 @@ Better Phantom handling for SMP
 
 # Configuration
 
-There are two configuration options that you can set.
+There are three core configuration options that you can set.
 
 * `remove-targeting-rested`: *Default: true.* Remove phantoms that try to
   target players who recently rested.
@@ -37,3 +37,4 @@ they will despawn immediately.  The same happens when the player is given the
 
 * [Spigot resource link](https://www.spigotmc.org/resources/phantomsmp.59721/)
 * [BukkitDev resource link](https://dev.bukkit.org/projects/phantomsmp)
+* [bStats Metrics](https://bstats.org/plugin/bukkit/PhantomSMP/)

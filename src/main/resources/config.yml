@@ -19,3 +19,7 @@ remove-when-sleeping: false
 #   ignored for phantom spawning.  It will only have an effect on already
 #   spawned phantoms only.
 disallow-targeting-for: 72000
+
+# Enable metrics for this plugin? (If unsure, leave it as true)
+#   Link to metrics: https://bstats.org/plugin/bukkit/PhantomSMP/
+enable-metrics: true
