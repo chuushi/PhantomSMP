@@ -18,12 +18,12 @@ public class PhantomSMP extends JavaPlugin {
         PhantomSMP.instance = this;
         saveDefaultConfig();
 
-        if (getConfig().getInt(ConfigSaver.CONFIG_VERSION_NODE) != ConfigSaver.version)
+        if (getConfig().getInt(ConfigTool.CONFIG_VERSION_NODE) != ConfigTool.version)
             saveConfig();
 
-        this.removeTargetingRested = getConfig().getBoolean(ConfigSaver.REMOVE_TARGETING_RESTED_NODE, true);
-        this.removeWhenSleeping = getConfig().getBoolean(ConfigSaver.REMOVE_WHEN_SLEEPING_NODE, false);
-        this.disallowSpawningFor= getConfig().getInt(ConfigSaver.DISALLOW_SPAWNING_FOR_NODE, 72000);
+        this.removeTargetingRested = getConfig().getBoolean(ConfigTool.REMOVE_TARGETING_RESTED_NODE, true);
+        this.removeWhenSleeping = getConfig().getBoolean(ConfigTool.REMOVE_WHEN_SLEEPING_NODE, false);
+        this.disallowSpawningFor= getConfig().getInt(ConfigTool.DISALLOW_SPAWNING_FOR_NODE, 72000);
 
         this.listener = new PhantomListener();
         getServer().getPluginManager().registerEvents(listener, this);
@@ -42,7 +42,7 @@ public class PhantomSMP extends JavaPlugin {
         try {
             //noinspection ResultOfMethodCallIgnored
             configFile.mkdirs();
-            String data = ConfigSaver.saveToString(getConfig());
+            String data = ConfigTool.saveToString(getConfig());
 
             try (Writer writer = new OutputStreamWriter(new FileOutputStream(configFile), Charsets.UTF_8)) {
                 writer.write(data);

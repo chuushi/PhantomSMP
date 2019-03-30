@@ -51,30 +51,34 @@ public class PhantomListener implements Listener {
     }
 
     private void targeting(Phantom phantom, Player newTarget, Cancellable e) {
-        plugin.getLogger().info("Targeting triggered");
+        // Clean up old target
+        Player old = phantomPlayerMap.remove(phantom);
+        if (old != null) {
+            playerPhantomMap.get(old).remove(phantom);
+        }
+
+        // get new target
         Player p;
         if (newTarget != null)
             p = newTarget;
-        else if (phantom.getTarget() instanceof Player) {
+        else if (phantom.getTarget() instanceof Player)
             p = (Player) phantom.getTarget();
-        } else {
-            plugin.getLogger().info("Target is null");
+        else
             return;
-        }
+
+        boolean ignore = p.hasPermission(IGNORE_PERM);
 
         // If newly spawned phantom
         if (newPhantom.remove(phantom)) {
-            if (p.hasPermission(DISALLOW_SPAWN_PERM) || recentlyRested(p)) {
+            if (ignore || p.hasPermission(DISALLOW_SPAWN_PERM) || recentlyRested(p)) {
                 if (e != null)
                     e.setCancelled(true);
                 phantom.remove();
-                plugin.getLogger().info("Phantom removed");
                 return;
             }
         }
 
         // If targeting is not allowed
-        boolean ignore = p.hasPermission(IGNORE_PERM);
         if (ignore || recentlyRested(p)) {
             if (e != null)
                 e.setCancelled(true);
@@ -84,19 +88,16 @@ public class PhantomListener implements Listener {
             if (!ignore && plugin.removeTargetingRested && phantom.getCustomName() == null)
                 phantom.remove();
 
-            plugin.getLogger().info("Phantom targetting cancelled");
             return;
         }
 
-        // Phantom spawn is legal
+        // Phantom target is legal
         playerPhantomMap.computeIfAbsent(p, k -> new LinkedHashSet<>()).add(phantom);
         phantomPlayerMap.put(phantom, p);
-        plugin.getLogger().info("Phantom is now targetting");
     }
 
     private void spawned(Phantom phantom) {
         newPhantom.add(phantom);
-        plugin.getLogger().info("New phantom spawned");
     }
 
     private void untarget(Player p, boolean sleeping) {
@@ -106,13 +107,10 @@ public class PhantomListener implements Listener {
             if (phantom.getTarget() == p) {
                 phantomPlayerMap.remove(phantom);
                 phantom.setTarget(null);
-                plugin.getLogger().info("Phantom no longer targets");
             }
 
-            if (sleeping && plugin.removeWhenSleeping) {
+            if (sleeping && plugin.removeWhenSleeping)
                 phantom.remove();
-                plugin.getLogger().info("Phantom removed");
-            }
             i.remove();
         }
     }
@@ -140,7 +138,8 @@ public class PhantomListener implements Listener {
             return;
         }
 
-        spawned((Phantom) e.getEntity());
+        if (e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL)
+            spawned((Phantom) e.getEntity());
     }
 
     @EventHandler

@@ -2,7 +2,7 @@ package com.simonorj.mc.phantomsmp;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
-class ConfigSaver {
+class ConfigTool {
     static final String REMOVE_TARGETING_RESTED_NODE = "remove-targeting-rested";
     static final String REMOVE_WHEN_SLEEPING_NODE = "remove-when-sleeping";
     static final String DISALLOW_SPAWNING_FOR_NODE = "disallow-targeting-for";
