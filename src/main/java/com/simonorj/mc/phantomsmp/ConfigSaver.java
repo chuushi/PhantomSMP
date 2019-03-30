@@ -27,7 +27,7 @@ class ConfigSaver {
             "#   spawned phantoms only.\n";
 
     private static final String CONFIG_VERSION =
-            "# Keeps track of configuration version -- do not change!";
+            "# Keeps track of configuration version -- do not change!\n";
 
     static String saveToString(FileConfiguration config) {
         boolean remove = config.getBoolean(REMOVE_TARGETING_RESTED_NODE, true);
