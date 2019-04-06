@@ -35,8 +35,8 @@ public class PhantomSMP extends JavaPlugin {
 
     private void setupMetrics() {
         Metrics metrics = new Metrics(this);
-        metrics.addCustomChart(new Metrics.SimplePie("remove-targeting-rested", () -> String.valueOf(removeTargetingRested)));
-        metrics.addCustomChart(new Metrics.SimplePie("remove-targeting-rested", () -> String.valueOf(removeWhenSleeping)));
+        metrics.addCustomChart(new Metrics.SimplePie("removeTargetingRested", () -> String.valueOf(removeTargetingRested)));
+        metrics.addCustomChart(new Metrics.SimplePie("removeWhenSleeping", () -> String.valueOf(removeWhenSleeping)));
     }
 
     @Override
