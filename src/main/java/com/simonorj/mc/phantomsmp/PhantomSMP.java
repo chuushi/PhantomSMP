@@ -1,7 +1,7 @@
 package com.simonorj.mc.phantomsmp;
 
 import com.google.common.base.Charsets;
-import com.simonorj.mc.phantomsmp.shadow.bstats.bukkit.Metrics;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
