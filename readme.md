@@ -1,4 +1,5 @@
 # ![Logo](https://www.spigotmc.org/data/resource_icons/59/59721.jpg) PhantomSMP
+[![Build Status](https://travis-ci.org/SimonOrJ/PhantomSMP.svg?branch=master)](https://travis-ci.org/SimonOrJ/PhantomSMP) [![Maintainability](https://api.codeclimate.com/v1/badges/ec57a5bdcfdb28f9d5cb/maintainability)](https://codeclimate.com/github/SimonOrJ/PhantomSMP/maintainability)
 
 *Better Phantom handling for SMP*
 
