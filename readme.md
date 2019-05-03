@@ -66,3 +66,5 @@ they will despawn immediately.  The same happens when the player is given the
 * [Spigot resource link](https://www.spigotmc.org/resources/phantomsmp.59721/)
 * [BukkitDev resource link](https://dev.bukkit.org/projects/phantomsmp)
 * [bStats Metrics](https://bstats.org/plugin/bukkit/PhantomSMP/)
+
+[![bStats PhantomSMP Signature](https://bstats.org/signatures/bukkit/PhantomSMP.svg)](https://bstats.org/plugin/bukkit/PhantomSMP/)
