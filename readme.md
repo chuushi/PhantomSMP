@@ -1,5 +1,5 @@
 # ![Logo](https://www.spigotmc.org/data/resource_icons/59/59721.jpg) PhantomSMP
-![Bukkit](https://img.shields.io/badge/bukkit-1.13.2-blue.svg)
+![Bukkit](https://img.shields.io/badge/bukkit-1.13%20--%201.14-blue.svg)
 [![GitHub All Release Downloads](https://img.shields.io/github/downloads/SimonOrJ/PhantomSMP/total.svg?label=github%20downloads)](https://github.com/SimonOrJ/PhantomSMP/releases)
 [![GitHub release](https://img.shields.io/github/release/SimonOrJ/PhantomSMP.svg)](https://github.com/SimonOrJ/PhantomSMP/releases/latest)
 [![GitHub pre-release](https://img.shields.io/github/release-pre/SimonOrJ/PhantomSMP.svg?label=pre-release)](https://github.com/SimonOrJ/PhantomSMP/releases)
