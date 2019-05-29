@@ -132,7 +132,14 @@ public class PhantomListener implements Listener {
     public void onPlayerLeave(PlayerQuitEvent e) {
         Player p = e.getPlayer();
 
-        for (Phantom phantom : playerPhantomMap.get(p)) {
+        Set<Phantom> phantoms = playerPhantomMap.get(p);
+
+        if (phantoms == null) {
+            plugin.getLogger().warning("Phantom list for '" + p.getName() + "' was not initiated! Was there an error during login?");
+            return;
+        }
+
+        for (Phantom phantom : phantoms) {
             if (phantom.getTarget() == p) {
                 phantom.setTarget(null);
                 phantomPlayerMap.remove(phantom);
@@ -173,7 +180,6 @@ public class PhantomListener implements Listener {
         targeting((Phantom) e.getEntity(), (Player) e.getTarget(), e);
     }
 
-    // Check phantom in loaded chunks
     @EventHandler
     public void onPhantomInLoadedChunk(ChunkLoadEvent e) {
         if (e.getWorld().getEnvironment() != World.Environment.NORMAL)
@@ -184,7 +190,6 @@ public class PhantomListener implements Listener {
                 targeting((Phantom) ent, null, null);
     }
 
-    // Untrack phantoms in unloaded chunks
     @EventHandler
     public void onPhantomInUnloadedChunk(ChunkUnloadEvent e) {
         if (e.getWorld().getEnvironment() != World.Environment.NORMAL)
