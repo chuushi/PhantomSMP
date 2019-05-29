@@ -17,6 +17,7 @@ import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 
 import java.util.*;
 
@@ -115,6 +116,13 @@ public class PhantomListener implements Listener {
         }
     }
 
+    private void removePhantom(Phantom phantom) {
+        Player p = phantomPlayerMap.remove(phantom);
+        if (p == null)
+            return;
+        playerPhantomMap.get(p).remove(phantom);
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent e) {
         playerPhantomMap.put(e.getPlayer(), new LinkedHashSet<>());
@@ -176,17 +184,22 @@ public class PhantomListener implements Listener {
                 targeting((Phantom) ent, null, null);
     }
 
+    // Untrack phantoms in unloaded chunks
+    @EventHandler
+    public void onPhantomInUnloadedChunk(ChunkUnloadEvent e) {
+        if (e.getWorld().getEnvironment() != World.Environment.NORMAL)
+            return;
+
+        for (Entity ent : e.getChunk().getEntities())
+            if (ent instanceof Phantom)
+                removePhantom((Phantom) ent);
+    }
+
     @EventHandler
     public void onPhantomDeath(EntityDeathEvent e) {
         if (!(e.getEntity() instanceof Phantom))
             return;
 
-        Phantom phantom = (Phantom) e.getEntity();
-
-        Player p = phantomPlayerMap.remove(phantom);
-        if (p == null)
-            return;
-
-        playerPhantomMap.get(p).remove(phantom);
+        removePhantom((Phantom) e.getEntity());
     }
 }
