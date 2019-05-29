@@ -25,7 +25,7 @@ public class PhantomListener implements Listener {
     private static final String DISALLOW_SPAWN_PERM = "phantomsmp.disallowspawn";
     private static final String IGNORE_PERM = "phantomsmp.ignore";
 
-    private final Map<Player, LinkedHashSet<Phantom>> playerPhantomMap = new HashMap<>();
+    private final Map<Player, Set<Phantom>> playerPhantomMap = new HashMap<>();
     private final Map<Phantom, Player> phantomPlayerMap = new HashMap<>();
     private final Set<Phantom> newPhantom = new LinkedHashSet<>();
     private final PhantomSMP plugin;
@@ -182,7 +182,7 @@ public class PhantomListener implements Listener {
 
     @EventHandler
     public void onPhantomInLoadedChunk(ChunkLoadEvent e) {
-        if (e.getWorld().getEnvironment() != World.Environment.NORMAL)
+        if (e.isNewChunk() || e.getWorld().getEnvironment() != World.Environment.NORMAL)
             return;
 
         for (Entity ent : e.getChunk().getEntities())
