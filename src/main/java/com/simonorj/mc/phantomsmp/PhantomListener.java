@@ -67,34 +67,23 @@ public class PhantomListener implements Listener {
         else
             return;
 
-        boolean ignore = p.hasPermission(IGNORE_PERM);
-
-        // If newly spawned phantom
-        if (newPhantom.remove(phantom)) {
-            if (ignore || p.hasPermission(DISALLOW_SPAWN_PERM) || recentlyRested(p)) {
-                if (e != null)
-                    e.setCancelled(true);
-                phantom.remove();
-                return;
-            }
-        }
-
-        // If targeting is not allowed
-        if (ignore || recentlyRested(p)) {
+        boolean newlySpawned = newPhantom.remove(phantom);
+        if (ignorePlayer(p, newlySpawned)) {
             if (e != null)
                 e.setCancelled(true);
+            else if (newlySpawned || !p.hasPermission(IGNORE_PERM) && plugin.removeTargetingRested && phantom.getCustomName() == null)
+                phantom.remove();
             else
                 phantom.setTarget(null);
-
-            if (!ignore && plugin.removeTargetingRested && phantom.getCustomName() == null)
-                phantom.remove();
-
-            return;
         }
 
         // Phantom target is legal
         playerPhantomMap.computeIfAbsent(p, k -> new LinkedHashSet<>()).add(phantom);
         phantomPlayerMap.put(phantom, p);
+    }
+
+    private boolean ignorePlayer(Player p, boolean newlySpawnedPhantom) {
+        return p.hasPermission(IGNORE_PERM) || newlySpawnedPhantom && p.hasPermission(DISALLOW_SPAWN_PERM) || recentlyRested(p);
     }
 
     private void spawned(Phantom phantom) {
