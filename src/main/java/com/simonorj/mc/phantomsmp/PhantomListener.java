@@ -71,7 +71,8 @@ public class PhantomListener implements Listener {
         if (ignorePlayer(p, newlySpawned)) {
             if (e != null)
                 e.setCancelled(true);
-            else if (newlySpawned || !p.hasPermission(IGNORE_PERM) && plugin.removeTargetingRested && phantom.getCustomName() == null)
+
+            if (newlySpawned || !p.hasPermission(IGNORE_PERM) && plugin.removeTargetingRested && phantom.getCustomName() == null)
                 phantom.remove();
             else
                 phantom.setTarget(null);
