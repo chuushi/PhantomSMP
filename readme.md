@@ -24,7 +24,7 @@ the next sunrise.
 This plugin addresses this issue. Features:
 
 * Phantoms will ignore players who used the bed within last three Minecraft
-  days. In addition, this duration is configurable.
+  days. (The duration is configurable)
 * Phantoms will ignore or despawn on players who uses the bed or is killed.
   This is configurable as well.
 * Control if the phantoms should despawn when they try to target a rested

@@ -17,6 +17,7 @@ import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 
 import java.util.*;
 
@@ -24,7 +25,7 @@ public class PhantomListener implements Listener {
     private static final String DISALLOW_SPAWN_PERM = "phantomsmp.disallowspawn";
     private static final String IGNORE_PERM = "phantomsmp.ignore";
 
-    private final Map<Player, LinkedHashSet<Phantom>> playerPhantomMap = new HashMap<>();
+    private final Map<Player, Set<Phantom>> playerPhantomMap = new HashMap<>();
     private final Map<Phantom, Player> phantomPlayerMap = new HashMap<>();
     private final Set<Phantom> newPhantom = new LinkedHashSet<>();
     private final PhantomSMP plugin;
@@ -66,34 +67,24 @@ public class PhantomListener implements Listener {
         else
             return;
 
-        boolean ignore = p.hasPermission(IGNORE_PERM);
-
-        // If newly spawned phantom
-        if (newPhantom.remove(phantom)) {
-            if (ignore || p.hasPermission(DISALLOW_SPAWN_PERM) || recentlyRested(p)) {
-                if (e != null)
-                    e.setCancelled(true);
-                phantom.remove();
-                return;
-            }
-        }
-
-        // If targeting is not allowed
-        if (ignore || recentlyRested(p)) {
+        boolean newlySpawned = newPhantom.remove(phantom);
+        if (ignorePlayer(p, newlySpawned)) {
             if (e != null)
                 e.setCancelled(true);
+
+            if (newlySpawned || !p.hasPermission(IGNORE_PERM) && plugin.removeTargetingRested && phantom.getCustomName() == null)
+                phantom.remove();
             else
                 phantom.setTarget(null);
-
-            if (!ignore && plugin.removeTargetingRested && phantom.getCustomName() == null)
-                phantom.remove();
-
-            return;
         }
 
         // Phantom target is legal
         playerPhantomMap.computeIfAbsent(p, k -> new LinkedHashSet<>()).add(phantom);
         phantomPlayerMap.put(phantom, p);
+    }
+
+    private boolean ignorePlayer(Player p, boolean newlySpawnedPhantom) {
+        return p.hasPermission(IGNORE_PERM) || newlySpawnedPhantom && p.hasPermission(DISALLOW_SPAWN_PERM) || recentlyRested(p);
     }
 
     private void spawned(Phantom phantom) {
@@ -115,6 +106,13 @@ public class PhantomListener implements Listener {
         }
     }
 
+    private void removePhantom(Phantom phantom) {
+        Player p = phantomPlayerMap.remove(phantom);
+        if (p == null)
+            return;
+        playerPhantomMap.get(p).remove(phantom);
+    }
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent e) {
         playerPhantomMap.put(e.getPlayer(), new LinkedHashSet<>());
@@ -124,7 +122,14 @@ public class PhantomListener implements Listener {
     public void onPlayerLeave(PlayerQuitEvent e) {
         Player p = e.getPlayer();
 
-        for (Phantom phantom : playerPhantomMap.get(p)) {
+        Set<Phantom> phantoms = playerPhantomMap.get(p);
+
+        if (phantoms == null) {
+            plugin.getLogger().warning("Phantom list for '" + p.getName() + "' was not initiated! Was there an error during login?");
+            return;
+        }
+
+        for (Phantom phantom : phantoms) {
             if (phantom.getTarget() == p) {
                 phantom.setTarget(null);
                 phantomPlayerMap.remove(phantom);
@@ -165,10 +170,9 @@ public class PhantomListener implements Listener {
         targeting((Phantom) e.getEntity(), (Player) e.getTarget(), e);
     }
 
-    // Check phantom in loaded chunks
     @EventHandler
     public void onPhantomInLoadedChunk(ChunkLoadEvent e) {
-        if (e.getWorld().getEnvironment() != World.Environment.NORMAL)
+        if (e.isNewChunk() || e.getWorld().getEnvironment() != World.Environment.NORMAL)
             return;
 
         for (Entity ent : e.getChunk().getEntities())
@@ -177,16 +181,20 @@ public class PhantomListener implements Listener {
     }
 
     @EventHandler
+    public void onPhantomInUnloadedChunk(ChunkUnloadEvent e) {
+        if (e.getWorld().getEnvironment() != World.Environment.NORMAL)
+            return;
+
+        for (Entity ent : e.getChunk().getEntities())
+            if (ent instanceof Phantom)
+                removePhantom((Phantom) ent);
+    }
+
+    @EventHandler
     public void onPhantomDeath(EntityDeathEvent e) {
         if (!(e.getEntity() instanceof Phantom))
             return;
 
-        Phantom phantom = (Phantom) e.getEntity();
-
-        Player p = phantomPlayerMap.remove(phantom);
-        if (p == null)
-            return;
-
-        playerPhantomMap.get(p).remove(phantom);
+        removePhantom((Phantom) e.getEntity());
     }
 }

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.simonorj.mc.phantomsmp</groupId>
     <artifactId>PhantomSMP</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <url>https://github.com/SimonOrJ/PhantomSMP</url>
     <issueManagement>
         <url>https://github.com/SimonOrJ/PhantomSMP/issues</url>
@@ -28,13 +28,13 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.13.1-R0.1-SNAPSHOT</version>
+            <version>1.13.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
