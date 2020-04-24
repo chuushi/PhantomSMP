@@ -1,5 +1,8 @@
 package com.simonorj.mc.phantomsmp;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Statistic;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -7,17 +10,16 @@ import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 
@@ -25,16 +27,15 @@ public class PhantomListener implements Listener {
     private static final String DISALLOW_SPAWN_PERM = "phantomsmp.disallowspawn";
     private static final String IGNORE_PERM = "phantomsmp.ignore";
 
-    private final Map<Player, Set<Phantom>> playerPhantomMap = new HashMap<>();
-    private final Map<Phantom, Player> phantomPlayerMap = new HashMap<>();
-    private final Set<Phantom> newPhantom = new LinkedHashSet<>();
+    private final NamespacedKey newlySpawnedKey;
+
+    private final Multimap<UUID, UUID> playerPhantomMap = MultimapBuilder.hashKeys().hashSetValues().build();
+    private final Map<UUID, UUID> phantomPlayerMap = new HashMap<>();
     private final PhantomSMP plugin;
 
     PhantomListener() {
         this.plugin = PhantomSMP.getInstance();
-        for (Player p : plugin.getServer().getOnlinePlayers()) {
-            this.playerPhantomMap.put(p, new LinkedHashSet<>());
-        }
+        newlySpawnedKey = new NamespacedKey(plugin, "newlyspawned");
 
         // Initiate map
         for (World w : plugin.getServer().getWorlds()) {
@@ -53,9 +54,9 @@ public class PhantomListener implements Listener {
 
     private void targeting(Phantom phantom, Player newTarget, Cancellable e) {
         // Clean up old target
-        Player old = phantomPlayerMap.remove(phantom);
+        UUID old = phantomPlayerMap.remove(phantom.getUniqueId());
         if (old != null) {
-            playerPhantomMap.get(old).remove(phantom);
+            playerPhantomMap.remove(old, phantom.getUniqueId());
         }
 
         // get new target
@@ -67,7 +68,10 @@ public class PhantomListener implements Listener {
         else
             return;
 
-        boolean newlySpawned = newPhantom.remove(phantom);
+        boolean newlySpawned = phantom.getPersistentDataContainer().has(newlySpawnedKey, PersistentDataType.BYTE);
+        if (newlySpawned) {
+            phantom.getPersistentDataContainer().remove(newlySpawnedKey);
+        }
         if (ignorePlayer(p, newlySpawned)) {
             if (e != null)
                 e.setCancelled(true);
@@ -79,8 +83,8 @@ public class PhantomListener implements Listener {
         }
 
         // Phantom target is legal
-        playerPhantomMap.computeIfAbsent(p, k -> new LinkedHashSet<>()).add(phantom);
-        phantomPlayerMap.put(phantom, p);
+        playerPhantomMap.put(p.getUniqueId(), phantom.getUniqueId());
+        phantomPlayerMap.put(phantom.getUniqueId(), p.getUniqueId());
     }
 
     private boolean ignorePlayer(Player p, boolean newlySpawnedPhantom) {
@@ -88,51 +92,43 @@ public class PhantomListener implements Listener {
     }
 
     private void spawned(Phantom phantom) {
-        newPhantom.add(phantom);
+        phantom.getPersistentDataContainer().set(newlySpawnedKey, PersistentDataType.BYTE, (byte) 1);
     }
 
     private void untarget(Player p, boolean sleeping) {
-        Iterator<Phantom> i = playerPhantomMap.get(p).iterator();
+        Iterator<UUID> i = playerPhantomMap.get(p.getUniqueId()).iterator();
         while(i.hasNext()) {
-            Phantom phantom = i.next();
-            if (phantom.getTarget() == p) {
-                phantomPlayerMap.remove(phantom);
-                phantom.setTarget(null);
-            }
+            Entity entity = plugin.getServer().getEntity(i.next());
+            if (entity instanceof Phantom) {
+                Phantom phantom = (Phantom) entity;
+                if (phantom.getTarget() == p) {
+                    phantomPlayerMap.remove(phantom.getUniqueId());
+                    phantom.setTarget(null);
+                }
 
-            if (sleeping && plugin.removeWhenSleeping)
-                phantom.remove();
+                if (sleeping && plugin.removeWhenSleeping)
+                    phantom.remove();
+            }
             i.remove();
         }
     }
 
     private void removePhantom(Phantom phantom) {
-        Player p = phantomPlayerMap.remove(phantom);
+        UUID p = phantomPlayerMap.remove(phantom.getUniqueId());
         if (p == null)
             return;
-        playerPhantomMap.get(p).remove(phantom);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerJoin(PlayerJoinEvent e) {
-        playerPhantomMap.put(e.getPlayer(), new LinkedHashSet<>());
+        playerPhantomMap.remove(p, phantom.getUniqueId());
     }
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent e) {
         Player p = e.getPlayer();
 
-        Set<Phantom> phantoms = playerPhantomMap.get(p);
-
-        if (phantoms == null) {
-            plugin.getLogger().warning("Phantom list for '" + p.getName() + "' was not initiated! Was there an error during login?");
-            return;
-        }
-
-        for (Phantom phantom : phantoms) {
-            if (phantom.getTarget() == p) {
-                phantom.setTarget(null);
-                phantomPlayerMap.remove(phantom);
+        for (UUID phantomId : playerPhantomMap.removeAll(p.getUniqueId())) {
+            Entity entity = plugin.getServer().getEntity(phantomId);
+            if (entity instanceof Phantom && ((Phantom) entity).getTarget() == p) {
+                ((Phantom) entity).setTarget(null);
+                phantomPlayerMap.remove(entity.getUniqueId(), p.getUniqueId());
             }
         }
     }
