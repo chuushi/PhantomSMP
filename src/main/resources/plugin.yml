@@ -1,6 +1,6 @@
 name: PhantomSMP
 version: @version@
-author: Simon Chuu
+authors: [Simon Chuu, Phoenix616]
 description: Advanced phantom mechanics especially for SMP servers
 main: com.simonorj.mc.phantomsmp.PhantomSMP
 website: https://github.com/SimonOrJ/PhantomSMP

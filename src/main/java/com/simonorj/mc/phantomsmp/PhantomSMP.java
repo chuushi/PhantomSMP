@@ -4,7 +4,11 @@ import com.google.common.base.Charsets;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.logging.Level;
 
 public class PhantomSMP extends JavaPlugin {

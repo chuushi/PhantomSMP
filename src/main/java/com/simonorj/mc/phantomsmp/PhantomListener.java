@@ -21,7 +21,10 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 
 public class PhantomListener implements Listener {
     private static final String DISALLOW_SPAWN_PERM = "phantomsmp.disallowspawn";
