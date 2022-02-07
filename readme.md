@@ -3,7 +3,6 @@
 [![GitHub All Release Downloads](https://img.shields.io/github/downloads/SimonOrJ/PhantomSMP/total.svg?label=github%20downloads)](https://github.com/SimonOrJ/PhantomSMP/releases)
 [![GitHub release](https://img.shields.io/github/release/SimonOrJ/PhantomSMP.svg)](https://github.com/SimonOrJ/PhantomSMP/releases/latest)
 [![GitHub pre-release](https://img.shields.io/github/release-pre/SimonOrJ/PhantomSMP.svg?label=pre-release)](https://github.com/SimonOrJ/PhantomSMP/releases)
-[![Discord](https://img.shields.io/discord/575193581363527690.svg?color=7289DA&logo=discord&logoColor=fff)](https://discord.gg/w2QsH9G)
 [![Build Status](https://travis-ci.org/SimonOrJ/PhantomSMP.svg?branch=master)](https://travis-ci.org/SimonOrJ/PhantomSMP) [![Maintainability](https://api.codeclimate.com/v1/badges/ec57a5bdcfdb28f9d5cb/maintainability)](https://codeclimate.com/github/SimonOrJ/PhantomSMP/maintainability)
 
 *Better Phantom handling for SMP*
